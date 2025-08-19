@@ -3,11 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { SalesChart } from "@/components/dashboard/SalesChart";
 import { SessionsChart } from "@/components/dashboard/SessionsChart";
 import { FilterPanel } from "@/components/dashboard/FilterPanel";
-import { BarChart3, TrendingUp, Users, ShoppingBag, Plus } from "lucide-react";
+import { PeriodComparison } from "@/components/dashboard/PeriodComparison";
+import { BarChart3, TrendingUp, Users, ShoppingBag, Plus, Trash2, GitCompare } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export interface DataRecord {
@@ -24,6 +26,7 @@ export interface DataRecord {
 const Dashboard = () => {
   const [data, setData] = useState<DataRecord[]>([]);
   const [filteredData, setFilteredData] = useState<DataRecord[]>([]);
+  const [showComparison, setShowComparison] = useState(false);
   const [filters, setFilters] = useState({
     month: "",
     session: "",
@@ -31,6 +34,7 @@ const Dashboard = () => {
     subgroup: "",
     store: ""
   });
+  const { toast } = useToast();
 
   useEffect(() => {
     const storedData = localStorage.getItem("dashboardData");
@@ -80,6 +84,16 @@ const Dashboard = () => {
     });
   };
 
+  const clearAllData = () => {
+    localStorage.removeItem("dashboardData");
+    setData([]);
+    setFilteredData([]);
+    toast({
+      title: "Dados removidos",
+      description: "Todos os dados foram removidos com sucesso",
+    });
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-8">
@@ -96,8 +110,19 @@ const Dashboard = () => {
           </div>
           
           <div className="flex gap-3">
+            <Button 
+              variant={showComparison ? "default" : "outline"} 
+              onClick={() => setShowComparison(!showComparison)}
+            >
+              <GitCompare className="h-4 w-4 mr-2" />
+              {showComparison ? "Ocultar Comparação" : "Comparar Períodos"}
+            </Button>
             <Button variant="outline" onClick={clearFilters}>
               Limpar Filtros
+            </Button>
+            <Button variant="destructive" onClick={clearAllData}>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Zerar Dados
             </Button>
             <Link to="/upload">
               <Button className="bg-gradient-primary hover:opacity-90 transition-all duration-300">
@@ -108,14 +133,27 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Filter Panel */}
-        <FilterPanel 
-          data={data}
-          filters={filters}
-          onFilterChange={handleFilterChange}
-        />
+        {/* Filter Panel - Only show if not in comparison mode */}
+        {!showComparison && (
+          <FilterPanel 
+            data={data}
+            filters={filters}
+            onFilterChange={handleFilterChange}
+          />
+        )}
 
-        {/* Active Filters */}
+        {/* Period Comparison */}
+        {showComparison && (
+          <PeriodComparison 
+            data={data}
+            onClose={() => setShowComparison(false)}
+          />
+        )}
+
+        {/* Regular Dashboard Content - Only show if not in comparison mode */}
+        {!showComparison && (
+          <>
+            {/* Active Filters */}
         {Object.entries(filters).some(([_, value]) => value !== "") && (
           <div className="flex flex-wrap gap-2">
             <span className="text-sm text-muted-foreground">Filtros ativos:</span>
@@ -199,6 +237,8 @@ const Dashboard = () => {
             )}
           </CardContent>
         </Card>
+          </>
+        )}
       </div>
     </div>
   );
