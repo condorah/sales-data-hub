@@ -16,6 +16,7 @@ export interface DataRecord {
   session: string;
   group: string;
   subgroup: string;
+  store: string;
   total: number;
   date: string;
 }
@@ -27,7 +28,8 @@ const Dashboard = () => {
     month: "",
     session: "",
     group: "",
-    subgroup: ""
+    subgroup: "",
+    store: ""
   });
 
   useEffect(() => {
@@ -54,6 +56,9 @@ const Dashboard = () => {
     if (filters.subgroup) {
       filtered = filtered.filter(item => item.subgroup === filters.subgroup);
     }
+    if (filters.store) {
+      filtered = filtered.filter(item => item.store === filters.store);
+    }
 
     setFilteredData(filtered);
   }, [filters, data]);
@@ -70,7 +75,8 @@ const Dashboard = () => {
       month: "",
       session: "",
       group: "",
-      subgroup: ""
+      subgroup: "",
+      store: ""
     });
   };
 
@@ -147,6 +153,7 @@ const Dashboard = () => {
                   <thead>
                     <tr className="border-b border-border">
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Mês</th>
+                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Loja</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Sessão</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Grupo</th>
                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subgrupo</th>
@@ -157,6 +164,9 @@ const Dashboard = () => {
                     {filteredData.slice(0, 10).map((item) => (
                       <tr key={item.id} className="border-b border-border hover:bg-muted/50 transition-colors">
                         <td className="py-3 px-4">{item.month}</td>
+                        <td className="py-3 px-4">
+                          <Badge variant="secondary">{item.store}</Badge>
+                        </td>
                         <td className="py-3 px-4">
                           <Badge variant="outline">{item.session}</Badge>
                         </td>

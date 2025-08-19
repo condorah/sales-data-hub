@@ -10,7 +10,8 @@ export const DashboardMetrics = ({ data }: DashboardMetricsProps) => {
   const totalSales = data.reduce((sum, item) => sum + item.total, 0);
   const uniqueSessions = new Set(data.map(item => item.session)).size;
   const uniqueGroups = new Set(data.map(item => item.group)).size;
-  const averagePerSession = uniqueSessions > 0 ? totalSales / uniqueSessions : 0;
+  const uniqueStores = new Set(data.map(item => item.store)).size;
+  const averagePerStore = uniqueStores > 0 ? totalSales / uniqueStores : 0;
 
   const metrics = [
     {
@@ -30,16 +31,16 @@ export const DashboardMetrics = ({ data }: DashboardMetricsProps) => {
       description: "novas sessões"
     },
     {
-      title: "Grupos Ativos",
-      value: uniqueGroups.toString(),
+      title: "Lojas Ativas",
+      value: uniqueStores.toString(),
       icon: BarChart3,
-      trend: "0",
-      trendUp: false,
-      description: "sem alteração"
+      trend: "+1",
+      trendUp: true,
+      description: "nova loja"
     },
     {
-      title: "Média por Sessão",
-      value: Math.round(averagePerSession).toLocaleString('pt-BR'),
+      title: "Média por Loja",
+      value: Math.round(averagePerStore).toLocaleString('pt-BR'),
       icon: TrendingUp,
       trend: "+8%",
       trendUp: true,

@@ -13,7 +13,8 @@ const DataUpload = () => {
     month: "",
     session: "",
     group: "",
-    subgroup: ""
+    subgroup: "",
+    store: ""
   });
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -33,6 +34,7 @@ const DataUpload = () => {
 
   const groups = ["Premium", "Standard", "Básico", "Promocional"];
   const subgroups = ["A", "B", "C", "D"];
+  const stores = ["Loja 01", "Loja 02", "Loja 05", "Loja 07", "Loja 08", "Loja 09"];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -69,7 +71,7 @@ const DataUpload = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.month || !formData.session || !formData.group || !formData.subgroup || !file) {
+    if (!formData.month || !formData.session || !formData.group || !formData.subgroup || !formData.store || !file) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos e selecione um arquivo",
@@ -92,6 +94,7 @@ const DataUpload = () => {
         session: formData.session,
         group: formData.group,
         subgroup: formData.subgroup,
+        store: formData.store,
         total,
         date: new Date().toISOString()
       };
@@ -107,7 +110,7 @@ const DataUpload = () => {
       });
 
       // Reset form
-      setFormData({ month: "", session: "", group: "", subgroup: "" });
+      setFormData({ month: "", session: "", group: "", subgroup: "", store: "" });
       setFile(null);
       
       // Redirect to dashboard
@@ -188,8 +191,8 @@ const DataUpload = () => {
                 </Select>
               </div>
 
-              {/* Group and Subgroup */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Group, Subgroup and Store */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="group">Grupo</Label>
                   <Select value={formData.group} onValueChange={(value) => handleInputChange("group", value)}>
@@ -213,6 +216,20 @@ const DataUpload = () => {
                     <SelectContent>
                       {subgroups.map((subgroup) => (
                         <SelectItem key={subgroup} value={subgroup}>{subgroup}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="store">Loja</Label>
+                  <Select value={formData.store} onValueChange={(value) => handleInputChange("store", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione a loja" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {stores.map((store) => (
+                        <SelectItem key={store} value={store}>{store}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>

@@ -10,6 +10,7 @@ interface FilterPanelProps {
     session: string;
     group: string;
     subgroup: string;
+    store: string;
   };
   onFilterChange: (key: string, value: string) => void;
 }
@@ -19,6 +20,7 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
   const uniqueSessions = [...new Set(data.map(item => item.session))];
   const uniqueGroups = [...new Set(data.map(item => item.group))];
   const uniqueSubgroups = [...new Set(data.map(item => item.subgroup))];
+  const uniqueStores = [...new Set(data.map(item => item.store))];
 
   return (
     <Card className="shadow-card">
@@ -29,7 +31,7 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {/* Month Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">Mês</label>
@@ -101,6 +103,25 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
                 <SelectItem value="todos">Todos os subgrupos</SelectItem>
                 {uniqueSubgroups.map((subgroup) => (
                   <SelectItem key={subgroup} value={subgroup}>{subgroup}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Store Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground">Loja</label>
+            <Select 
+              value={filters.store || "todos"} 
+              onValueChange={(value) => onFilterChange("store", value)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="todos">Todas as lojas</SelectItem>
+                {uniqueStores.map((store) => (
+                  <SelectItem key={store} value={store}>{store}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
