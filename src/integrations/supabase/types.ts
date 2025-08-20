@@ -14,7 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      sales_data: {
+        Row: {
+          created_at: string
+          date: string | null
+          group: string
+          id: string
+          month: string
+          session: string
+          store: string
+          subgroup: string
+          total: number
+          year: string
+        }
+        Insert: {
+          created_at?: string
+          date?: string | null
+          group: string
+          id?: string
+          month: string
+          session: string
+          store: string
+          subgroup: string
+          total: number
+          year: string
+        }
+        Update: {
+          created_at?: string
+          date?: string | null
+          group?: string
+          id?: string
+          month?: string
+          session?: string
+          store?: string
+          subgroup?: string
+          total?: number
+          year?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

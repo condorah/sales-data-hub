@@ -12,6 +12,7 @@ import { PeriodComparison } from "@/components/dashboard/PeriodComparison";
 import { AdvancedAnalytics } from "@/components/dashboard/AdvancedAnalytics";
 import { BarChart3, TrendingUp, Users, ShoppingBag, Plus, Trash2, GitCompare } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface DataRecord {
   id: string;
@@ -39,13 +40,34 @@ const Dashboard = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const storedData = localStorage.getItem("dashboardData");
-    if (storedData) {
-      const parsedData = JSON.parse(storedData);
-      setData(parsedData);
-      setFilteredData(parsedData);
-    }
-  }, []);
+    const fetchData = async () => {
+      try {
+        const { data: salesData, error } = await supabase
+          .from('sales_data')
+          .select('*')
+          .order('created_at', { ascending: false });
+
+        if (error) {
+          console.error('Error fetching data:', error);
+          toast({
+            title: "Erro ao carregar dados",
+            description: "Não foi possível carregar os dados do servidor",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        if (salesData) {
+          setData(salesData);
+          setFilteredData(salesData);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+      }
+    };
+
+    fetchData();
+  }, [toast]);
 
   useEffect(() => {
     let filtered = [...data];
@@ -86,14 +108,31 @@ const Dashboard = () => {
     });
   };
 
-  const clearAllData = () => {
-    localStorage.removeItem("dashboardData");
-    setData([]);
-    setFilteredData([]);
-    toast({
-      title: "Dados removidos",
-      description: "Todos os dados foram removidos com sucesso",
-    });
+  const clearAllData = async () => {
+    try {
+      const { error } = await supabase
+        .from('sales_data')
+        .delete()
+        .neq('id', '00000000-0000-0000-0000-000000000000'); // Delete all records
+
+      if (error) {
+        throw error;
+      }
+
+      setData([]);
+      setFilteredData([]);
+      toast({
+        title: "Dados removidos",
+        description: "Todos os dados foram removidos com sucesso",
+      });
+    } catch (error) {
+      console.error('Error clearing data:', error);
+      toast({
+        title: "Erro ao remover dados",
+        description: "Não foi possível remover os dados do servidor",
+        variant: "destructive"
+      });
+    }
   };
 
   return (

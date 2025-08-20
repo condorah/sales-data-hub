@@ -7,6 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { Upload, FileSpreadsheet, ArrowLeft, Check } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const DataUpload = () => {
   const [formData, setFormData] = useState({
@@ -84,7 +85,6 @@ const DataUpload = () => {
       const total = processExcelData();
       
       const newRecord = {
-        id: crypto.randomUUID(),
         month: formData.month,
         year: formData.year,
         session: formData.session,
@@ -95,10 +95,14 @@ const DataUpload = () => {
         date: new Date().toISOString()
       };
 
-      // Salvar no localStorage (em produção seria uma API)
-      const existingData = JSON.parse(localStorage.getItem("dashboardData") || "[]");
-      const updatedData = [...existingData, newRecord];
-      localStorage.setItem("dashboardData", JSON.stringify(updatedData));
+      // Salvar no Supabase
+      const { error } = await supabase
+        .from('sales_data')
+        .insert([newRecord]);
+
+      if (error) {
+        throw error;
+      }
 
       toast({
         title: "Dados enviados com sucesso!",
