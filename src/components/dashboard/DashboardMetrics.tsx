@@ -12,39 +12,57 @@ export const DashboardMetrics = ({ data }: DashboardMetricsProps) => {
   const uniqueGroups = new Set(data.map(item => item.group)).size;
   const uniqueStores = new Set(data.map(item => item.store)).size;
   const averagePerStore = uniqueStores > 0 ? totalSales / uniqueStores : 0;
+  
+  // Análises avançadas
+  const topSession = data.length > 0 ? 
+    Object.entries(data.reduce((acc, item) => {
+      acc[item.session] = (acc[item.session] || 0) + item.total;
+      return acc;
+    }, {} as Record<string, number>))
+    .sort(([,a], [,b]) => b - a)[0] : null;
+
+  const topStore = data.length > 0 ?
+    Object.entries(data.reduce((acc, item) => {
+      acc[item.store] = (acc[item.store] || 0) + item.total;
+      return acc;
+    }, {} as Record<string, number>))
+    .sort(([,a], [,b]) => b - a)[0] : null;
+
+  const growthRate = data.length > 1 ? 
+    ((data[data.length - 1]?.total || 0) - (data[0]?.total || 0)) / (data[0]?.total || 1) * 100 : 0;
 
   const metrics = [
     {
       title: "Total de Vendas",
       value: totalSales.toLocaleString('pt-BR'),
       icon: TrendingUp,
-      trend: "+12%",
-      trendUp: true,
-      description: "vs mês anterior"
+      trend: `${growthRate >= 0 ? '+' : ''}${growthRate.toFixed(1)}%`,
+      trendUp: growthRate >= 0,
+      description: "crescimento geral"
     },
     {
       title: "Sessões Ativas",
       value: uniqueSessions.toString(),
       icon: Users,
-      trend: "+3",
+      trend: topSession ? topSession[0].substring(0, 15) : "N/A",
       trendUp: true,
-      description: "novas sessões"
+      description: "sessão líder"
     },
     {
-      title: "Lojas Ativas",
+      title: "Lojas Ativas", 
       value: uniqueStores.toString(),
       icon: BarChart3,
-      trend: "+1",
+      trend: topStore ? topStore[0] : "N/A",
       trendUp: true,
-      description: "nova loja"
+      description: "loja líder"
     },
     {
       title: "Média por Loja",
       value: Math.round(averagePerStore).toLocaleString('pt-BR'),
       icon: TrendingUp,
-      trend: "+8%",
+      trend: `${uniqueGroups}`,
       trendUp: true,
-      description: "vs período anterior"
+      description: "grupos ativos"
     }
   ];
 

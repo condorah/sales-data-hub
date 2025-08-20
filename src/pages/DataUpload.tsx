@@ -11,6 +11,7 @@ import { Link, useNavigate } from "react-router-dom";
 const DataUpload = () => {
   const [formData, setFormData] = useState({
     month: "",
+    year: "",
     session: "",
     group: "",
     subgroup: "",
@@ -26,14 +27,8 @@ const DataUpload = () => {
     "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
   ];
 
-  const sessions = [
-    "Eletrodomésticos", "Moda e Acessórios", "Casa e Decoração", 
-    "Informática", "Livros e Papelaria", "Esporte e Lazer",
-    "Beleza e Saúde", "Automotivo"
-  ];
-
-  const groups = ["Premium", "Standard", "Básico", "Promocional"];
-  const subgroups = ["A", "B", "C", "D"];
+  const getCurrentYear = () => new Date().getFullYear();
+  const years = Array.from({ length: 10 }, (_, i) => getCurrentYear() - 5 + i);
   const stores = ["Loja 01", "Loja 02", "Loja 05", "Loja 07", "Loja 08", "Loja 09"];
 
   const handleInputChange = (field: string, value: string) => {
@@ -71,7 +66,7 @@ const DataUpload = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.month || !formData.session || !formData.group || !formData.subgroup || !formData.store || !file) {
+    if (!formData.month || !formData.year || !formData.session || !formData.group || !formData.subgroup || !formData.store || !file) {
       toast({
         title: "Campos obrigatórios",
         description: "Por favor, preencha todos os campos e selecione um arquivo",
@@ -91,6 +86,7 @@ const DataUpload = () => {
       const newRecord = {
         id: crypto.randomUUID(),
         month: formData.month,
+        year: formData.year,
         session: formData.session,
         group: formData.group,
         subgroup: formData.subgroup,
@@ -110,7 +106,7 @@ const DataUpload = () => {
       });
 
       // Reset form
-      setFormData({ month: "", session: "", group: "", subgroup: "", store: "" });
+      setFormData({ month: "", year: "", session: "", group: "", subgroup: "", store: "" });
       setFile(null);
       
       // Redirect to dashboard
@@ -161,79 +157,93 @@ const DataUpload = () => {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              {/* Month Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="month">Mês de Referência</Label>
-                <Select value={formData.month} onValueChange={(value) => handleInputChange("month", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione o mês" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month} value={month}>{month}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Session Selection */}
-              <div className="space-y-2">
-                <Label htmlFor="session">Sessão</Label>
-                <Select value={formData.session} onValueChange={(value) => handleInputChange("session", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a sessão" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {sessions.map((session) => (
-                      <SelectItem key={session} value={session}>{session}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Group, Subgroup and Store */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Month and Year Selection */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="group">Grupo</Label>
-                  <Select value={formData.group} onValueChange={(value) => handleInputChange("group", value)}>
+                  <Label htmlFor="month">Mês de Referência</Label>
+                  <Select value={formData.month} onValueChange={(value) => handleInputChange("month", value)}>
                     <SelectTrigger>
-                      <SelectValue placeholder="Selecione o grupo" />
+                      <SelectValue placeholder="Selecione o mês" />
                     </SelectTrigger>
                     <SelectContent>
-                      {groups.map((group) => (
-                        <SelectItem key={group} value={group}>{group}</SelectItem>
+                      {months.map((month) => (
+                        <SelectItem key={month} value={month}>{month}</SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="year">Ano de Referência</Label>
+                  <Select value={formData.year} onValueChange={(value) => handleInputChange("year", value)}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Selecione o ano" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {years.map((year) => (
+                        <SelectItem key={year} value={year.toString()}>{year}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+
+              {/* Session Input */}
+              <div className="space-y-2">
+                <Label htmlFor="session">Sessão</Label>
+                <Input
+                  id="session"
+                  type="text"
+                  value={formData.session}
+                  onChange={(e) => handleInputChange("session", e.target.value)}
+                  placeholder="Digite o nome da sessão (ex: Eletrodomésticos)"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Digite o nome da sessão de vendas (ex: Moda, Eletrônicos, Casa e Decoração)
+                </p>
+              </div>
+
+              {/* Group and Subgroup Inputs */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="group">Grupo</Label>
+                  <Input
+                    id="group"
+                    type="text"
+                    value={formData.group}
+                    onChange={(e) => handleInputChange("group", e.target.value)}
+                    placeholder="Digite o grupo (ex: Premium)"
+                    className="w-full"
+                  />
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="subgroup">Subgrupo</Label>
-                  <Select value={formData.subgroup} onValueChange={(value) => handleInputChange("subgroup", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione o subgrupo" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {subgroups.map((subgroup) => (
-                        <SelectItem key={subgroup} value={subgroup}>{subgroup}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <Input
+                    id="subgroup"
+                    type="text"
+                    value={formData.subgroup}
+                    onChange={(e) => handleInputChange("subgroup", e.target.value)}
+                    placeholder="Digite o subgrupo (ex: A1)"
+                    className="w-full"
+                  />
                 </div>
+              </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="store">Loja</Label>
-                  <Select value={formData.store} onValueChange={(value) => handleInputChange("store", value)}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Selecione a loja" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {stores.map((store) => (
-                        <SelectItem key={store} value={store}>{store}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* Store Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="store">Loja</Label>
+                <Select value={formData.store} onValueChange={(value) => handleInputChange("store", value)}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Selecione a loja" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {stores.map((store) => (
+                      <SelectItem key={store} value={store}>{store}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* File Upload */}

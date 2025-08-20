@@ -9,12 +9,14 @@ import { SalesChart } from "@/components/dashboard/SalesChart";
 import { SessionsChart } from "@/components/dashboard/SessionsChart";
 import { FilterPanel } from "@/components/dashboard/FilterPanel";
 import { PeriodComparison } from "@/components/dashboard/PeriodComparison";
+import { AdvancedAnalytics } from "@/components/dashboard/AdvancedAnalytics";
 import { BarChart3, TrendingUp, Users, ShoppingBag, Plus, Trash2, GitCompare } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export interface DataRecord {
   id: string;
   month: string;
+  year: string;
   session: string;
   group: string;
   subgroup: string;
@@ -175,6 +177,9 @@ const Dashboard = () => {
           <SalesChart data={filteredData} />
           <SessionsChart data={filteredData} />
         </div>
+
+        {/* Advanced Analytics */}
+        <AdvancedAnalytics data={filteredData} />
 
         {/* Recent Data Table */}
         <Card className="shadow-card">
