@@ -21,10 +21,18 @@ export type Database = {
           group: string
           id: string
           month: string
+          product_code: string | null
+          product_description: string | null
+          profit_percentage: number | null
+          profit_value: number | null
+          quantity_percentage: number | null
+          quantity_sold: number | null
           session: string
           store: string
           subgroup: string
           total: number
+          value_percentage: number | null
+          value_sold: number | null
           year: string
         }
         Insert: {
@@ -33,10 +41,18 @@ export type Database = {
           group: string
           id?: string
           month: string
+          product_code?: string | null
+          product_description?: string | null
+          profit_percentage?: number | null
+          profit_value?: number | null
+          quantity_percentage?: number | null
+          quantity_sold?: number | null
           session: string
           store: string
           subgroup: string
           total: number
+          value_percentage?: number | null
+          value_sold?: number | null
           year: string
         }
         Update: {
@@ -45,10 +61,18 @@ export type Database = {
           group?: string
           id?: string
           month?: string
+          product_code?: string | null
+          product_description?: string | null
+          profit_percentage?: number | null
+          profit_value?: number | null
+          quantity_percentage?: number | null
+          quantity_sold?: number | null
           session?: string
           store?: string
           subgroup?: string
           total?: number
+          value_percentage?: number | null
+          value_sold?: number | null
           year?: string
         }
         Relationships: []

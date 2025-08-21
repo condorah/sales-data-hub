@@ -8,7 +8,7 @@ import { DashboardMetrics } from "@/components/dashboard/DashboardMetrics";
 import { SalesChart } from "@/components/dashboard/SalesChart";
 import { SessionsChart } from "@/components/dashboard/SessionsChart";
 import { FilterPanel } from "@/components/dashboard/FilterPanel";
-import { PeriodComparison } from "@/components/dashboard/PeriodComparison";
+import { TripleComparison } from "@/components/dashboard/TripleComparison";
 import { AdvancedAnalytics } from "@/components/dashboard/AdvancedAnalytics";
 import { BarChart3, TrendingUp, Users, ShoppingBag, Plus, Trash2, GitCompare } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -24,6 +24,14 @@ export interface DataRecord {
   store: string;
   total: number;
   date: string;
+  product_code?: string;
+  product_description?: string;
+  quantity_sold?: number;
+  value_sold?: number;
+  profit_value?: number;
+  quantity_percentage?: number;
+  value_percentage?: number;
+  profit_percentage?: number;
 }
 
 const Dashboard = () => {
@@ -35,7 +43,8 @@ const Dashboard = () => {
     session: "",
     group: "",
     subgroup: "",
-    store: ""
+    store: "",
+    product: ""
   });
   const { toast } = useToast();
 
@@ -87,6 +96,12 @@ const Dashboard = () => {
     if (filters.store) {
       filtered = filtered.filter(item => item.store === filters.store);
     }
+    if (filters.product) {
+      filtered = filtered.filter(item => 
+        item.product_code?.toLowerCase().includes(filters.product.toLowerCase()) ||
+        item.product_description?.toLowerCase().includes(filters.product.toLowerCase())
+      );
+    }
 
     setFilteredData(filtered);
   }, [filters, data]);
@@ -104,7 +119,8 @@ const Dashboard = () => {
       session: "",
       group: "",
       subgroup: "",
-      store: ""
+      store: "",
+      product: ""
     });
   };
 
@@ -156,7 +172,7 @@ const Dashboard = () => {
               onClick={() => setShowComparison(!showComparison)}
             >
               <GitCompare className="h-4 w-4 mr-2" />
-              {showComparison ? "Ocultar Comparação" : "Comparar Períodos"}
+              {showComparison ? "Ocultar Comparação" : "Comparação Tripla"}
             </Button>
             <Button variant="outline" onClick={clearFilters}>
               Limpar Filtros
@@ -185,7 +201,7 @@ const Dashboard = () => {
 
         {/* Period Comparison */}
         {showComparison && (
-          <PeriodComparison 
+          <TripleComparison 
             data={data}
             onClose={() => setShowComparison(false)}
           />
@@ -231,36 +247,47 @@ const Dashboard = () => {
           <CardContent>
             {filteredData.length > 0 ? (
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Mês</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Loja</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Sessão</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Grupo</th>
-                      <th className="text-left py-3 px-4 font-medium text-muted-foreground">Subgrupo</th>
-                      <th className="text-right py-3 px-4 font-medium text-muted-foreground">Total</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredData.slice(0, 10).map((item) => (
-                      <tr key={item.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                        <td className="py-3 px-4">{item.month}</td>
-                        <td className="py-3 px-4">
-                          <Badge variant="secondary">{item.store}</Badge>
-                        </td>
-                        <td className="py-3 px-4">
-                          <Badge variant="outline">{item.session}</Badge>
-                        </td>
-                        <td className="py-3 px-4">{item.group}</td>
-                        <td className="py-3 px-4">{item.subgroup}</td>
-                        <td className="py-3 px-4 text-right font-semibold text-primary">
-                          {item.total.toLocaleString('pt-BR')}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                 <table className="w-full">
+                   <thead>
+                     <tr className="border-b border-border">
+                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Mês</th>
+                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Loja</th>
+                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Produto</th>
+                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Sessão</th>
+                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Qtd</th>
+                       <th className="text-right py-3 px-4 font-medium text-muted-foreground">Valor</th>
+                       <th className="text-right py-3 px-4 font-medium text-muted-foreground">Lucro</th>
+                     </tr>
+                   </thead>
+                   <tbody>
+                     {filteredData.slice(0, 10).map((item) => (
+                       <tr key={item.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                         <td className="py-3 px-4">{item.month}</td>
+                         <td className="py-3 px-4">
+                           <Badge variant="secondary">{item.store}</Badge>
+                         </td>
+                         <td className="py-3 px-4">
+                           <div className="max-w-xs">
+                             <div className="font-medium text-sm">{item.product_code}</div>
+                             <div className="text-xs text-muted-foreground truncate">{item.product_description}</div>
+                           </div>
+                         </td>
+                         <td className="py-3 px-4">
+                           <Badge variant="outline">{item.session}</Badge>
+                         </td>
+                         <td className="py-3 px-4 text-center">
+                           {item.quantity_sold?.toLocaleString('pt-BR')}
+                         </td>
+                         <td className="py-3 px-4 text-right font-semibold text-primary">
+                           R$ {item.value_sold?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                         </td>
+                         <td className="py-3 px-4 text-right font-semibold text-success">
+                           R$ {item.profit_value?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                         </td>
+                       </tr>
+                     ))}
+                   </tbody>
+                 </table>
               </div>
             ) : (
               <div className="text-center py-12">

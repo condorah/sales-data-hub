@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Upload, FileSpreadsheet, ArrowLeft, Check } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import * as XLSX from 'xlsx';
 
 const DataUpload = () => {
   const [formData, setFormData] = useState({
@@ -56,12 +57,55 @@ const DataUpload = () => {
     }
   };
 
-  const processExcelData = () => {
-    // Simular processamento do Excel - em produção usaria uma biblioteca como xlsx
-    // Por agora, vamos gerar dados aleatórios para demonstração
-    const columnAValues = Array.from({ length: 50 }, () => Math.floor(Math.random() * 1000) + 100);
-    const total = columnAValues.reduce((sum, value) => sum + value, 0);
-    return total;
+  const processExcelData = async (file: File) => {
+    return new Promise<any[]>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = e.target?.result;
+          const workbook = XLSX.read(data, { type: 'binary' });
+          const sheetName = workbook.SheetNames[0];
+          const worksheet = workbook.Sheets[sheetName];
+          const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+          
+          const processedData = [];
+          
+          // Skip header row and process data
+          for (let i = 1; i < jsonData.length; i++) {
+            const row = jsonData[i] as any[];
+            if (row.length > 0 && row[0]) { // Check if row has data
+              const productCode = row[0]?.toString() || '';
+              const productDescription = row[1]?.toString() || '';
+              const quantitySold = parseInt(row[2]) || 0;
+              const valueSold = parseFloat(row[3]) || 0;
+              const profitValue = parseFloat(row[7]) || 0; // Column H
+              const quantityPercentage = parseFloat(row[8]) || 0; // Column I
+              const valuePercentage = parseFloat(row[9]) || 0; // Column J
+              const profitPercentage = parseFloat(row[10]) || 0; // Column K
+              
+              if (productCode) {
+                processedData.push({
+                  product_code: productCode,
+                  product_description: productDescription,
+                  quantity_sold: quantitySold,
+                  value_sold: valueSold,
+                  profit_value: profitValue,
+                  quantity_percentage: quantityPercentage,
+                  value_percentage: valuePercentage,
+                  profit_percentage: profitPercentage
+                });
+              }
+            }
+          }
+          
+          resolve(processedData);
+        } catch (error) {
+          reject(error);
+        }
+      };
+      reader.onerror = () => reject(new Error('Erro ao ler arquivo'));
+      reader.readAsBinaryString(file);
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,34 +123,53 @@ const DataUpload = () => {
     setIsLoading(true);
 
     try {
-      // Simular processamento
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      // Processar dados do Excel
+      const excelData = await processExcelData(file);
       
-      const total = processExcelData();
-      
-      const newRecord = {
+      if (excelData.length === 0) {
+        toast({
+          title: "Arquivo vazio",
+          description: "Nenhum dado válido encontrado no arquivo Excel",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Preparar registros para inserção
+      const recordsToInsert = excelData.map(item => ({
         month: formData.month,
         year: formData.year,
         session: formData.session,
         group: formData.group,
         subgroup: formData.subgroup,
         store: formData.store,
-        total,
+        total: item.value_sold, // Manter compatibilidade
+        product_code: item.product_code,
+        product_description: item.product_description,
+        quantity_sold: item.quantity_sold,
+        value_sold: item.value_sold,
+        profit_value: item.profit_value,
+        quantity_percentage: item.quantity_percentage,
+        value_percentage: item.value_percentage,
+        profit_percentage: item.profit_percentage,
         date: new Date().toISOString()
-      };
+      }));
 
       // Salvar no Supabase
       const { error } = await supabase
         .from('sales_data')
-        .insert([newRecord]);
+        .insert(recordsToInsert);
 
       if (error) {
         throw error;
       }
 
+      const totalValue = excelData.reduce((sum, item) => sum + item.value_sold, 0);
+      const totalQuantity = excelData.reduce((sum, item) => sum + item.quantity_sold, 0);
+
       toast({
         title: "Dados enviados com sucesso!",
-        description: `Total processado: ${total.toLocaleString('pt-BR')} unidades`,
+        description: `${excelData.length} produtos processados - Total: R$ ${totalValue.toLocaleString('pt-BR')} (${totalQuantity.toLocaleString('pt-BR')} unidades)`,
       });
 
       // Reset form
@@ -278,7 +341,7 @@ const DataUpload = () => {
                   </label>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  Os dados devem estar na coluna A do arquivo Excel. Apenas valores numéricos serão somados.
+                  <strong>Estrutura do Excel:</strong> A=Código, B=Descrição, C=Quantidade, D=Valor (R$), H=Lucro (R$), I=% Quantidade, J=% Valor, K=% Lucro
                 </p>
               </div>
 

@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Input } from "@/components/ui/input";
 import { Filter } from "lucide-react";
 import type { DataRecord } from "@/pages/Dashboard";
 
@@ -11,6 +12,7 @@ interface FilterPanelProps {
     group: string;
     subgroup: string;
     store: string;
+    product: string;
   };
   onFilterChange: (key: string, value: string) => void;
 }
@@ -31,7 +33,7 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
           {/* Month Filter */}
           <div className="space-y-2">
             <label className="text-sm font-medium text-muted-foreground">Mês</label>
@@ -125,6 +127,16 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          {/* Product Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-muted-foreground">Produto</label>
+            <Input
+              placeholder="Buscar produto..."
+              value={filters.product}
+              onChange={(e) => onFilterChange("product", e.target.value)}
+            />
           </div>
         </div>
       </CardContent>
