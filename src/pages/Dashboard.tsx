@@ -10,7 +10,10 @@ import { SessionsChart } from "@/components/dashboard/SessionsChart";
 import { FilterPanel } from "@/components/dashboard/FilterPanel";
 import { TripleComparison } from "@/components/dashboard/TripleComparison";
 import { AdvancedAnalytics } from "@/components/dashboard/AdvancedAnalytics";
-import { BarChart3, TrendingUp, Users, ShoppingBag, Plus, Trash2, GitCompare } from "lucide-react";
+import { CustomPieChart } from "@/components/dashboard/PieChart";
+import { ABCAnalysis } from "@/components/dashboard/ABCAnalysis";
+import { TopPerformers } from "@/components/dashboard/TopPerformers";
+import { BarChart3, TrendingUp, Users, ShoppingBag, Plus, GitCompare } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -159,8 +162,8 @@ const Dashboard = () => {
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
               <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
-              <span className="hidden sm:inline">Dashboard de Análise de Vendas</span>
-              <span className="sm:hidden">Dashboard</span>
+              <span className="hidden sm:inline">Análise de curva ABC - Nilo Atacadista</span>
+              <span className="sm:hidden">Curva ABC - Nilo</span>
             </h1>
             <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               Monitore e analise suas vendas por sessão, grupo e período
@@ -177,10 +180,6 @@ const Dashboard = () => {
             </Button>
             <Button variant="outline" onClick={clearFilters}>
               Limpar Filtros
-            </Button>
-            <Button variant="destructive" onClick={clearAllData}>
-              <Trash2 className="h-4 w-4 mr-2" />
-              Zerar Dados
             </Button>
             <Link to="/upload">
               <Button className="bg-gradient-primary hover:opacity-90 transition-all duration-300">
@@ -271,6 +270,30 @@ const Dashboard = () => {
           <SalesChart data={filteredData} />
           <SessionsChart data={filteredData} />
         </div>
+
+        {/* Pie Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <CustomPieChart 
+            data={filteredData} 
+            title="Faturamento por Loja"
+            dataKey="store"
+            valueKey="value_sold"
+            valueLabel="Faturamento"
+          />
+          <CustomPieChart 
+            data={filteredData} 
+            title="Lucro por Sessão"
+            dataKey="session"
+            valueKey="profit_value"
+            valueLabel="Lucro"
+          />
+        </div>
+
+        {/* Top Performers */}
+        <TopPerformers data={filteredData} />
+
+        {/* ABC Analysis */}
+        <ABCAnalysis data={filteredData} />
 
         {/* Advanced Analytics */}
         <AdvancedAnalytics data={filteredData} />
