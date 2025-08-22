@@ -9,23 +9,23 @@ interface SessionsChartProps {
 
 export const SessionsChart = ({ data }: SessionsChartProps) => {
   const chartData = data.reduce((acc, item) => {
-    const existing = acc.find(d => d.session === item.session);
+    const existing = acc.find(d => d.month === item.month);
     if (existing) {
-      existing.total += item.total;
+      existing.profit += (item.profit_value || 0);
     } else {
-      acc.push({ session: item.session, total: item.total });
+      acc.push({ month: item.month, profit: (item.profit_value || 0) });
     }
     return acc;
-  }, [] as { session: string; total: number }[]);
+  }, [] as { month: string; profit: number }[]);
 
-  const sortedData = chartData.sort((a, b) => b.total - a.total);
+  const sortedData = chartData.sort((a, b) => b.profit - a.profit);
 
   return (
     <Card className="shadow-card">
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <Users className="h-5 w-5 text-primary" />
-          Vendas por Sessão
+          Lucro por Mês
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -34,13 +34,13 @@ export const SessionsChart = ({ data }: SessionsChartProps) => {
             <BarChart data={sortedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
               <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
               <XAxis 
-                dataKey="session" 
-                tick={{ fontSize: 10 }}
+                dataKey="month" 
+                tick={{ fontSize: 12 }}
                 axisLine={false}
                 tickLine={false}
                 angle={-45}
                 textAnchor="end"
-                height={80}
+                height={60}
               />
               <YAxis 
                 tick={{ fontSize: 12 }}
@@ -49,7 +49,7 @@ export const SessionsChart = ({ data }: SessionsChartProps) => {
                 tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
               />
               <Tooltip 
-                formatter={(value: number) => [value.toLocaleString('pt-BR'), 'Vendas']}
+                formatter={(value: number) => [`R$ ${value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, 'Lucro']}
                 labelStyle={{ color: 'hsl(var(--foreground))' }}
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--card))',
@@ -58,7 +58,7 @@ export const SessionsChart = ({ data }: SessionsChartProps) => {
                 }}
               />
               <Bar 
-                dataKey="total" 
+                dataKey="profit" 
                 fill="url(#gradient)" 
                 radius={[4, 4, 0, 0]}
               />

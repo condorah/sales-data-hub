@@ -152,21 +152,22 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-7xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-3 sm:p-6">
+      <div className="max-w-7xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <BarChart3 className="h-8 w-8 text-primary" />
-              Dashboard de Análise de Vendas
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+              <BarChart3 className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
+              <span className="hidden sm:inline">Dashboard de Análise de Vendas</span>
+              <span className="sm:hidden">Dashboard</span>
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               Monitore e analise suas vendas por sessão, grupo e período
             </p>
           </div>
           
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-3">
             <Button 
               variant={showComparison ? "default" : "outline"} 
               onClick={() => setShowComparison(!showComparison)}
@@ -217,11 +218,49 @@ const Dashboard = () => {
             {Object.entries(filters).map(([key, value]) => 
               value && (
                 <Badge key={key} variant="secondary" className="px-3 py-1">
-                  {key}: {value}
+                  {key === "product" ? `Produto: ${value}` : `${key}: ${value}`}
                 </Badge>
               )
             )}
           </div>
+        )}
+
+        {/* Product Results Summary */}
+        {filters.product && filteredData.length > 0 && (
+          <Card className="shadow-card bg-success/10 border-success/20">
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="p-2 bg-success/20 rounded-lg">
+                  <ShoppingBag className="h-5 w-5 text-success" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-success">Produtos Encontrados</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {filteredData.length} produto{filteredData.length !== 1 ? 's' : ''} encontrado{filteredData.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {[...new Set(filteredData.map(item => ({ 
+                  code: item.product_code, 
+                  description: item.product_description 
+                })).filter(p => p.code).map(p => JSON.stringify(p)))].slice(0, 5).map((productStr, index) => {
+                  const product = JSON.parse(productStr);
+                  return (
+                    <div key={index} className="flex items-center gap-2 p-2 bg-background rounded-md border border-border/50">
+                      <Badge variant="outline" className="text-xs">{product.code}</Badge>
+                      <span className="text-sm font-medium truncate">{product.description}</span>
+                    </div>
+                  );
+                })}
+                {filteredData.length > 5 && (
+                  <p className="text-xs text-muted-foreground text-center">
+                    ... e mais {filteredData.length - 5} produto{filteredData.length - 5 !== 1 ? 's' : ''}
+                  </p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Metrics */}
@@ -247,42 +286,50 @@ const Dashboard = () => {
           <CardContent>
             {filteredData.length > 0 ? (
               <div className="overflow-x-auto">
-                 <table className="w-full">
+                 <table className="w-full min-w-[800px]">
                    <thead>
                      <tr className="border-b border-border">
-                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Mês</th>
-                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Loja</th>
-                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Produto</th>
-                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Sessão</th>
-                       <th className="text-left py-3 px-4 font-medium text-muted-foreground">Qtd</th>
-                       <th className="text-right py-3 px-4 font-medium text-muted-foreground">Valor</th>
-                       <th className="text-right py-3 px-4 font-medium text-muted-foreground">Lucro</th>
+                       <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Mês</th>
+                       <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Loja</th>
+                       <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Produto</th>
+                       <th className="text-left py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Sessão</th>
+                       <th className="text-center py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Qtd</th>
+                       <th className="text-right py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Valor</th>
+                       <th className="text-right py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">Lucro</th>
+                       <th className="text-center py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">% Valor</th>
+                       <th className="text-center py-3 px-2 sm:px-4 font-medium text-muted-foreground text-xs sm:text-sm">% Lucro</th>
                      </tr>
                    </thead>
                    <tbody>
                      {filteredData.slice(0, 10).map((item) => (
                        <tr key={item.id} className="border-b border-border hover:bg-muted/50 transition-colors">
-                         <td className="py-3 px-4">{item.month}</td>
-                         <td className="py-3 px-4">
-                           <Badge variant="secondary">{item.store}</Badge>
+                         <td className="py-3 px-2 sm:px-4 text-xs sm:text-sm">{item.month}</td>
+                         <td className="py-3 px-2 sm:px-4">
+                           <Badge variant="secondary" className="text-xs">{item.store}</Badge>
                          </td>
-                         <td className="py-3 px-4">
-                           <div className="max-w-xs">
-                             <div className="font-medium text-sm">{item.product_code}</div>
+                         <td className="py-3 px-2 sm:px-4">
+                           <div className="max-w-[150px] sm:max-w-xs">
+                             <div className="font-medium text-xs sm:text-sm truncate">{item.product_code}</div>
                              <div className="text-xs text-muted-foreground truncate">{item.product_description}</div>
                            </div>
                          </td>
-                         <td className="py-3 px-4">
-                           <Badge variant="outline">{item.session}</Badge>
+                         <td className="py-3 px-2 sm:px-4">
+                           <Badge variant="outline" className="text-xs">{item.session}</Badge>
                          </td>
-                         <td className="py-3 px-4 text-center">
+                         <td className="py-3 px-2 sm:px-4 text-center text-xs sm:text-sm">
                            {item.quantity_sold?.toLocaleString('pt-BR')}
                          </td>
-                         <td className="py-3 px-4 text-right font-semibold text-primary">
+                         <td className="py-3 px-2 sm:px-4 text-right font-semibold text-primary text-xs sm:text-sm">
                            R$ {item.value_sold?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                          </td>
-                         <td className="py-3 px-4 text-right font-semibold text-success">
+                         <td className="py-3 px-2 sm:px-4 text-right font-semibold text-success text-xs sm:text-sm">
                            R$ {item.profit_value?.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                         </td>
+                         <td className="py-3 px-2 sm:px-4 text-center text-xs sm:text-sm">
+                           {item.value_percentage?.toFixed(1)}%
+                         </td>
+                         <td className="py-3 px-2 sm:px-4 text-center text-xs sm:text-sm">
+                           {item.profit_percentage?.toFixed(1)}%
                          </td>
                        </tr>
                      ))}

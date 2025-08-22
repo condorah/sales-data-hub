@@ -123,6 +123,30 @@ const DataUpload = () => {
     setIsLoading(true);
 
     try {
+      // Verificar se já existem dados para este período, loja e sessão
+      const { data: existingData, error: checkError } = await supabase
+        .from('sales_data')
+        .select('id')
+        .eq('month', formData.month)
+        .eq('year', formData.year)
+        .eq('session', formData.session)
+        .eq('store', formData.store)
+        .limit(1);
+
+      if (checkError) {
+        throw checkError;
+      }
+
+      if (existingData && existingData.length > 0) {
+        toast({
+          title: "Dados já existem",
+          description: `Já existem dados para ${formData.month}/${formData.year} - ${formData.session} - ${formData.store}`,
+          variant: "destructive"
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Processar dados do Excel
       const excelData = await processExcelData(file);
       
@@ -132,6 +156,7 @@ const DataUpload = () => {
           description: "Nenhum dado válido encontrado no arquivo Excel",
           variant: "destructive"
         });
+        setIsLoading(false);
         return;
       }
 
@@ -193,10 +218,10 @@ const DataUpload = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-6">
-      <div className="max-w-2xl mx-auto space-y-8">
+    <div className="min-h-screen bg-background p-3 sm:p-6">
+      <div className="max-w-2xl mx-auto space-y-6 sm:space-y-8">
         {/* Header */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <Link to="/">
             <Button variant="outline" size="sm">
               <ArrowLeft className="h-4 w-4 mr-2" />
@@ -204,11 +229,11 @@ const DataUpload = () => {
             </Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-foreground flex items-center gap-3">
-              <Upload className="h-8 w-8 text-primary" />
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground flex items-center gap-3">
+              <Upload className="h-6 w-6 sm:h-8 sm:w-8 text-primary" />
               Upload de Dados
             </h1>
-            <p className="text-muted-foreground mt-2">
+            <p className="text-muted-foreground mt-2 text-sm sm:text-base">
               Adicione novos dados de vendas ao dashboard
             </p>
           </div>
