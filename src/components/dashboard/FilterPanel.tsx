@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Filter } from "lucide-react";
+import { Label } from "@/components/ui/label";
+import { Filter, Search } from "lucide-react";
 import type { DataRecord } from "@/pages/Dashboard";
 
 interface FilterPanelProps {
@@ -25,24 +26,21 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
   const uniqueStores = [...new Set(data.map(item => item.store))];
 
   return (
-    <Card className="shadow-card">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Filter className="h-5 w-5 text-primary" />
-          Filtros
+    <Card className="shadow-card bg-gradient-to-r from-primary/5 to-success/5 border-primary/20">
+      <CardHeader className="pb-3 sm:pb-6">
+        <CardTitle className="flex items-center gap-2 text-base sm:text-lg">
+          <Filter className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+          Filtros de Análise
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3 sm:gap-4">
           {/* Month Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Mês</label>
-            <Select 
-              value={filters.month || "todos"} 
-              onValueChange={(value) => onFilterChange("month", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
+          <div className="space-y-1 sm:space-y-2">
+            <Label htmlFor="month-filter" className="text-xs sm:text-sm font-medium">Mês</Label>
+            <Select value={filters.month || "todos"} onValueChange={(value) => onFilterChange("month", value)}>
+              <SelectTrigger id="month-filter" className="h-8 sm:h-10 text-xs sm:text-sm">
+                <SelectValue placeholder="Todos os meses" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos os meses</SelectItem>
@@ -54,14 +52,11 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
           </div>
 
           {/* Session Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Sessão</label>
-            <Select 
-              value={filters.session || "todos"} 
-              onValueChange={(value) => onFilterChange("session", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
+          <div className="space-y-1 sm:space-y-2">
+            <Label htmlFor="session-filter" className="text-xs sm:text-sm font-medium">Sessão</Label>
+            <Select value={filters.session || "todos"} onValueChange={(value) => onFilterChange("session", value)}>
+              <SelectTrigger id="session-filter" className="h-8 sm:h-10 text-xs sm:text-sm">
+                <SelectValue placeholder="Todas as sessões" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todas as sessões</SelectItem>
@@ -73,14 +68,11 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
           </div>
 
           {/* Group Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Grupo</label>
-            <Select 
-              value={filters.group || "todos"} 
-              onValueChange={(value) => onFilterChange("group", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
+          <div className="space-y-1 sm:space-y-2">
+            <Label htmlFor="group-filter" className="text-xs sm:text-sm font-medium">Grupo</Label>
+            <Select value={filters.group || "todos"} onValueChange={(value) => onFilterChange("group", value)}>
+              <SelectTrigger id="group-filter" className="h-8 sm:h-10 text-xs sm:text-sm">
+                <SelectValue placeholder="Todos os grupos" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos os grupos</SelectItem>
@@ -92,14 +84,11 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
           </div>
 
           {/* Subgroup Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Subgrupo</label>
-            <Select 
-              value={filters.subgroup || "todos"} 
-              onValueChange={(value) => onFilterChange("subgroup", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
+          <div className="space-y-1 sm:space-y-2">
+            <Label htmlFor="subgroup-filter" className="text-xs sm:text-sm font-medium">Subgrupo</Label>
+            <Select value={filters.subgroup || "todos"} onValueChange={(value) => onFilterChange("subgroup", value)}>
+              <SelectTrigger id="subgroup-filter" className="h-8 sm:h-10 text-xs sm:text-sm">
+                <SelectValue placeholder="Todos os subgrupos" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todos os subgrupos</SelectItem>
@@ -111,14 +100,11 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
           </div>
 
           {/* Store Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Loja</label>
-            <Select 
-              value={filters.store || "todos"} 
-              onValueChange={(value) => onFilterChange("store", value)}
-            >
-              <SelectTrigger>
-                <SelectValue />
+          <div className="space-y-1 sm:space-y-2">
+            <Label htmlFor="store-filter" className="text-xs sm:text-sm font-medium">Loja</Label>
+            <Select value={filters.store || "todos"} onValueChange={(value) => onFilterChange("store", value)}>
+              <SelectTrigger id="store-filter" className="h-8 sm:h-10 text-xs sm:text-sm">
+                <SelectValue placeholder="Todas as lojas" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="todos">Todas as lojas</SelectItem>
@@ -129,14 +115,20 @@ export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps)
             </Select>
           </div>
 
-          {/* Product Filter */}
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-muted-foreground">Produto</label>
-            <Input
-              placeholder="Buscar produto..."
-              value={filters.product}
-              onChange={(e) => onFilterChange("product", e.target.value)}
-            />
+          {/* Product Search */}
+          <div className="space-y-1 sm:space-y-2">
+            <Label htmlFor="product-filter" className="text-xs sm:text-sm font-medium">Produto</Label>
+            <div className="relative">
+              <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 h-3 w-3 sm:h-4 sm:w-4 text-muted-foreground" />
+              <Input
+                id="product-filter"
+                type="text"
+                placeholder="Buscar produto..."
+                value={filters.product}
+                onChange={(e) => onFilterChange("product", e.target.value)}
+                className="pl-7 sm:pl-10 h-8 sm:h-10 text-xs sm:text-sm"
+              />
+            </div>
           </div>
         </div>
       </CardContent>

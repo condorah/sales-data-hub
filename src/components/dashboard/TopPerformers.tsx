@@ -76,7 +76,7 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
   };
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 animate-fade-in">
       {/* Top Stores */}
       <Card className="shadow-card">
         <CardHeader>
@@ -85,22 +85,22 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
             Todas as Lojas
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">
           {topStores.map((store, index) => (
-            <div key={store.name} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-3">
+            <div key={store.name} className="flex items-center justify-between p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <Badge className={getRankBadge(index)}>
                   #{index + 1}
                 </Badge>
-                <div>
-                  <p className="font-medium">{store.name}</p>
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm truncate">{store.name}</p>
                   <p className="text-xs text-muted-foreground">
                     Lucro: R$ {store.profit.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-primary">
+              <div className="text-right flex-shrink-0">
+                <p className="font-semibold text-primary text-xs sm:text-sm">
                   R$ {store.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
@@ -149,23 +149,23 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
             Top 10 Produtos
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-3 sm:space-y-4 max-h-96 overflow-y-auto">
           {topProducts.slice(0, 10).map((product, index) => (
-            <div key={product.code} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
-              <div className="flex items-center gap-3">
+            <div key={product.code} className="flex items-center justify-between p-2 sm:p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
+              <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                 <Badge className={getRankBadge(index)}>
                   #{index + 1}
                 </Badge>
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium text-sm truncate">{product.code}</p>
+                  <p className="font-medium text-xs sm:text-sm truncate">{product.code}</p>
                   <p className="text-xs text-muted-foreground truncate">{product.description}</p>
                   <p className="text-xs text-muted-foreground">
                     Qtd: {product.quantity.toLocaleString('pt-BR')}
                   </p>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="font-semibold text-primary text-sm">
+              <div className="text-right flex-shrink-0">
+                <p className="font-semibold text-primary text-xs sm:text-sm">
                   R$ {product.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                 </p>
               </div>
