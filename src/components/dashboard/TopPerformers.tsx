@@ -60,9 +60,9 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
     return acc;
   }, [] as { code: string; description: string; value: number; profit: number; quantity: number }[]);
 
-  const topStores = storeRevenue.sort((a, b) => b.value - a.value).slice(0, 5);
-  const topSessions = sessionRevenue.sort((a, b) => b.value - a.value).slice(0, 5);
-  const topProducts = productRevenue.sort((a, b) => b.value - a.value).slice(0, 5);
+  const topStores = storeRevenue.sort((a, b) => b.value - a.value);
+  const topSessions = sessionRevenue.sort((a, b) => b.value - a.value);
+  const topProducts = productRevenue.sort((a, b) => b.value - a.value);
 
   const getRankBadge = (index: number) => {
     const colors = [
@@ -82,7 +82,7 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Trophy className="h-5 w-5 text-primary" />
-            Top 5 Lojas
+            Todas as Lojas
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -114,7 +114,7 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Star className="h-5 w-5 text-primary" />
-            Top 5 Sessões
+            Todas as Sessões
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -146,11 +146,11 @@ export const TopPerformers = ({ data }: TopPerformersProps) => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <TrendingUp className="h-5 w-5 text-primary" />
-            Top 5 Produtos
+            Top 10 Produtos
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          {topProducts.map((product, index) => (
+          {topProducts.slice(0, 10).map((product, index) => (
             <div key={product.code} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
               <div className="flex items-center gap-3">
                 <Badge className={getRankBadge(index)}>

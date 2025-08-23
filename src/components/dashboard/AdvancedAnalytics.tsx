@@ -1,15 +1,77 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Target, TrendingUp, Award, AlertTriangle, Calendar, Zap } from "lucide-react";
+import { useState } from "react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from "recharts";
+import { Activity, BarChart3, PieChart as PieChartIcon, Filter, Target, TrendingUp, Award, AlertTriangle, Calendar, Zap } from "lucide-react";
 import type { DataRecord } from "@/pages/Dashboard";
 
 interface AdvancedAnalyticsProps {
   data: DataRecord[];
 }
 
+const COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--success))',
+  'hsl(var(--warning))',
+  'hsl(var(--destructive))',
+  'hsl(var(--accent))',
+  'hsl(220 91% 70%)',
+  'hsl(142 76% 56%)',
+  'hsl(38 92% 60%)',
+];
+
 export const AdvancedAnalytics = ({ data }: AdvancedAnalyticsProps) => {
+  const [barChartFilter, setBarChartFilter] = useState<string>("store");
+  const [pieChartFilter, setPieChartFilter] = useState<string>("session");
+  
   if (data.length === 0) return null;
+
+  // Bar Chart Data
+  const getBarChartData = () => {
+    const grouped = data.reduce((acc, item) => {
+      const key = item[barChartFilter as keyof DataRecord] as string;
+      const existing = acc.find(d => d.name === key);
+      if (existing) {
+        existing.faturamento += item.value_sold || 0;
+        existing.lucro += item.profit_value || 0;
+        existing.quantidade += item.quantity_sold || 0;
+      } else {
+        acc.push({ 
+          name: key, 
+          faturamento: item.value_sold || 0,
+          lucro: item.profit_value || 0,
+          quantidade: item.quantity_sold || 0
+        });
+      }
+      return acc;
+    }, [] as { name: string; faturamento: number; lucro: number; quantidade: number }[]);
+
+    return grouped.sort((a, b) => b.faturamento - a.faturamento);
+  };
+
+  // Pie Chart Data
+  const getPieChartData = () => {
+    const grouped = data.reduce((acc, item) => {
+      const key = item[pieChartFilter as keyof DataRecord] as string;
+      const existing = acc.find(d => d.name === key);
+      if (existing) {
+        existing.value += item.value_sold || 0;
+      } else {
+        acc.push({ 
+          name: key, 
+          value: item.value_sold || 0
+        });
+      }
+      return acc;
+    }, [] as { name: string; value: number }[]);
+
+    return grouped.sort((a, b) => b.value - a.value);
+  };
+
+  const barChartData = getBarChartData();
+  const pieChartData = getPieChartData();
 
   // Performance por loja
   const storePerformance = data.reduce((acc, item) => {
@@ -63,8 +125,197 @@ export const AdvancedAnalytics = ({ data }: AdvancedAnalyticsProps) => {
   const totalSales = data.reduce((sum, item) => sum + item.total, 0);
   const diversityScore = Object.keys(groupDiversity).length;
 
+  const CustomTooltip = ({ active, payload, label }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-medium mb-2">{label}</p>
+          {payload.map((entry: any, index: number) => (
+            <p key={index} style={{ color: entry.color }}>
+              {entry.dataKey === 'faturamento' && `Faturamento: R$ ${entry.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+              {entry.dataKey === 'lucro' && `Lucro: R$ ${entry.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const PieTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-card border border-border rounded-lg p-3 shadow-lg">
+          <p className="font-medium">{payload[0].payload.name}</p>
+          <p className="text-primary">
+            Faturamento: R$ {payload[0].value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  const renderPieLabel = (entry: any) => {
+    const percent = ((entry.value / pieChartData.reduce((sum, item) => sum + item.value, 0)) * 100).toFixed(1);
+    return `${percent}%`;
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div className="space-y-6">
+      {/* Summary Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <Card className="shadow-card bg-primary/10 border-primary/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-primary">Total de Lojas</p>
+                <p className="text-2xl font-bold">{[...new Set(data.map(item => item.store))].length}</p>
+              </div>
+              <Activity className="h-8 w-8 text-primary" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card bg-success/10 border-success/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-success">Total de Sessões</p>
+                <p className="text-2xl font-bold">{[...new Set(data.map(item => item.session))].length}</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-success" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="shadow-card bg-warning/10 border-warning/20">
+          <CardContent className="pt-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-warning">Total de Produtos</p>
+                <p className="text-2xl font-bold">{[...new Set(data.map(item => item.product_code))].filter(Boolean).length}</p>
+              </div>
+              <PieChartIcon className="h-8 w-8 text-warning" />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Charts */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Bar Chart with Filters */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <CardTitle className="flex items-center gap-2">
+                <BarChart3 className="h-5 w-5 text-primary" />
+                Análise Comparativa
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select value={barChartFilter} onValueChange={setBarChartFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="store">Loja</SelectItem>
+                    <SelectItem value="session">Sessão</SelectItem>
+                    <SelectItem value="group">Grupo</SelectItem>
+                    <SelectItem value="subgroup">Subgrupo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={barChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+                  <XAxis 
+                    dataKey="name" 
+                    tick={{ fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    angle={-45}
+                    textAnchor="end"
+                    height={60}
+                  />
+                  <YAxis 
+                    tick={{ fontSize: 12 }}
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Bar dataKey="faturamento" fill="hsl(var(--primary))" name="Faturamento" />
+                  <Bar dataKey="lucro" fill="hsl(var(--success))" name="Lucro" />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Pie Chart with Filters */}
+        <Card className="shadow-card">
+          <CardHeader>
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+              <CardTitle className="flex items-center gap-2">
+                <PieChartIcon className="h-5 w-5 text-primary" />
+                Distribuição de Faturamento
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select value={pieChartFilter} onValueChange={setPieChartFilter}>
+                  <SelectTrigger className="w-32">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="store">Loja</SelectItem>
+                    <SelectItem value="session">Sessão</SelectItem>
+                    <SelectItem value="group">Grupo</SelectItem>
+                    <SelectItem value="subgroup">Subgrupo</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <PieChart>
+                  <Pie
+                    data={pieChartData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={renderPieLabel}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {pieChartData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<PieTooltip />} />
+                  <Legend 
+                    verticalAlign="bottom" 
+                    height={36}
+                    formatter={(value) => (
+                      <span className="text-sm text-foreground">{value}</span>
+                    )}
+                  />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Traditional Analytics */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
       {/* Performance por Loja */}
       <Card className="shadow-card">
         <CardHeader>
@@ -217,6 +468,7 @@ export const AdvancedAnalytics = ({ data }: AdvancedAnalyticsProps) => {
           </div>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 };

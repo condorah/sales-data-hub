@@ -56,8 +56,7 @@ const Dashboard = () => {
       try {
         const { data: salesData, error } = await supabase
           .from('sales_data')
-          .select('*')
-          .order('created_at', { ascending: false });
+          .select('*');
 
         if (error) {
           console.error('Error fetching data:', error);
@@ -235,26 +234,35 @@ const Dashboard = () => {
                 <div>
                   <h3 className="text-lg font-semibold text-success">Produtos Encontrados</h3>
                   <p className="text-sm text-muted-foreground">
-                    {filteredData.length} produto{filteredData.length !== 1 ? 's' : ''} encontrado{filteredData.length !== 1 ? 's' : ''}
+                    Buscando por: "{filters.product}" - {filteredData.length} produto{filteredData.length !== 1 ? 's' : ''} encontrado{filteredData.length !== 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {[...new Set(filteredData.map(item => ({ 
                   code: item.product_code, 
-                  description: item.product_description 
-                })).filter(p => p.code).map(p => JSON.stringify(p)))].slice(0, 5).map((productStr, index) => {
+                  description: item.product_description,
+                  value: item.value_sold || 0,
+                  quantity: item.quantity_sold || 0
+                })).filter(p => p.code).map(p => JSON.stringify(p)))].slice(0, 10).map((productStr, index) => {
                   const product = JSON.parse(productStr);
                   return (
-                    <div key={index} className="flex items-center gap-2 p-2 bg-background rounded-md border border-border/50">
-                      <Badge variant="outline" className="text-xs">{product.code}</Badge>
-                      <span className="text-sm font-medium truncate">{product.description}</span>
+                    <div key={index} className="flex items-center justify-between p-3 bg-background rounded-lg border border-border/50 hover:bg-muted/30 transition-colors">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <Badge variant="outline" className="text-xs shrink-0">{product.code}</Badge>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-sm font-medium truncate">{product.description}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Qtd: {product.quantity.toLocaleString('pt-BR')} | Valor: R$ {product.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
-                {filteredData.length > 5 && (
-                  <p className="text-xs text-muted-foreground text-center">
-                    ... e mais {filteredData.length - 5} produto{filteredData.length - 5 !== 1 ? 's' : ''}
+                {filteredData.length > 10 && (
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    ... e mais {filteredData.length - 10} produto{filteredData.length - 10 !== 1 ? 's' : ''}
                   </p>
                 )}
               </div>
