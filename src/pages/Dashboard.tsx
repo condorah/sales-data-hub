@@ -56,7 +56,8 @@ const Dashboard = () => {
       try {
         const { data: salesData, error } = await supabase
           .from('sales_data')
-          .select('*');
+          .select('*')
+          .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Error fetching data:', error);
@@ -69,6 +70,9 @@ const Dashboard = () => {
         }
 
         if (salesData) {
+          console.log('Total dados carregados:', salesData.length);
+          console.log('Lojas encontradas:', [...new Set(salesData.map(d => d.store))]);
+          console.log('Dados da Loja 09:', salesData.filter(d => d.store === 'Loja 09').length);
           setData(salesData);
           setFilteredData(salesData);
         }
