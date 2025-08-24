@@ -123,13 +123,15 @@ const DataUpload = () => {
     setIsLoading(true);
 
     try {
-      // Verificar se já existem dados para este período, loja e sessão
+      // Verificar se já existem dados EXATOS para este período, loja, sessão E grupo/subgrupo
       const { data: existingData, error: checkError } = await supabase
         .from('sales_data')
         .select('id')
         .eq('month', formData.month)
         .eq('year', formData.year)
         .eq('session', formData.session)
+        .eq('group', formData.group)
+        .eq('subgroup', formData.subgroup)
         .eq('store', formData.store)
         .limit(1);
 
@@ -140,7 +142,7 @@ const DataUpload = () => {
       if (existingData && existingData.length > 0) {
         toast({
           title: "Dados já existem",
-          description: `Já existem dados para ${formData.month}/${formData.year} - ${formData.session} - ${formData.store}`,
+          description: `Já existem dados para ${formData.month}/${formData.year} - ${formData.session} - ${formData.group}/${formData.subgroup} - ${formData.store}`,
           variant: "destructive"
         });
         setIsLoading(false);

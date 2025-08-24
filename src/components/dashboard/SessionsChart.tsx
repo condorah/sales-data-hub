@@ -8,6 +8,11 @@ interface SessionsChartProps {
 }
 
 export const SessionsChart = ({ data }: SessionsChartProps) => {
+  const monthOrder = [
+    "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
+    "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"
+  ];
+
   const chartData = data.reduce((acc, item) => {
     const existing = acc.find(d => d.month === item.month);
     if (existing) {
@@ -18,7 +23,12 @@ export const SessionsChart = ({ data }: SessionsChartProps) => {
     return acc;
   }, [] as { month: string; profit: number }[]);
 
-  const sortedData = chartData.sort((a, b) => b.profit - a.profit);
+  // Ordenar por ordem cronológica dos meses
+  const sortedData = chartData.sort((a, b) => {
+    const indexA = monthOrder.indexOf(a.month);
+    const indexB = monthOrder.indexOf(b.month);
+    return indexA - indexB;
+  });
 
   return (
     <Card className="shadow-card">
