@@ -56,8 +56,7 @@ const Dashboard = () => {
       try {
         const { data: salesData, error } = await supabase
           .from('sales_data')
-          .select('*')
-          .order('created_at', { ascending: false });
+          .select('*');
 
         if (error) {
           console.error('Error fetching data:', error);
@@ -71,13 +70,19 @@ const Dashboard = () => {
 
         if (salesData) {
           console.log('Total dados carregados:', salesData.length);
-          console.log('Lojas encontradas:', [...new Set(salesData.map(d => d.store))]);
-          console.log('Dados da Loja 09:', salesData.filter(d => d.store === 'Loja 09').length);
+          console.log('Lojas encontradas:', [...new Set(salesData.map(d => d.store))].sort());
+          console.log('Meses encontrados:', [...new Set(salesData.map(d => d.month))].sort());
+          console.log('Anos encontrados:', [...new Set(salesData.map(d => d.year))].sort());
           setData(salesData);
           setFilteredData(salesData);
         }
       } catch (error) {
         console.error('Error:', error);
+        toast({
+          title: "Erro ao carregar dados",
+          description: "Erro interno do aplicativo",
+          variant: "destructive"
+        });
       }
     };
 
