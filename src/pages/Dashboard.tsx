@@ -71,6 +71,11 @@ const Dashboard = () => {
         if (salesData) {
           console.log('Total dados carregados:', salesData.length);
           console.log('Lojas encontradas:', [...new Set(salesData.map(d => d.store))].sort());
+          console.log('Dados por loja:', 
+            [...new Set(salesData.map(d => d.store))].sort().map(store => 
+              `${store}: ${salesData.filter(d => d.store === store).length} registros`
+            )
+          );
           console.log('Meses encontrados:', [...new Set(salesData.map(d => d.month))].sort());
           console.log('Anos encontrados:', [...new Set(salesData.map(d => d.year))].sort());
           setData(salesData);
