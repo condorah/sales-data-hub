@@ -56,7 +56,8 @@ const Dashboard = () => {
       try {
         const { data: salesData, error } = await supabase
           .from('sales_data')
-          .select('*');
+          .select('*')
+          .limit(2000); // Aumentar limite para garantir que todos os dados sejam carregados
 
         if (error) {
           console.error('Error fetching data:', error);
