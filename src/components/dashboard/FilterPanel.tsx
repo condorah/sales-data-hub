@@ -19,11 +19,11 @@ interface FilterPanelProps {
 }
 
 export const FilterPanel = ({ data, filters, onFilterChange }: FilterPanelProps) => {
-  const uniqueMonths = [...new Set(data.map(item => item.month))];
-  const uniqueSessions = [...new Set(data.map(item => item.session))];
-  const uniqueGroups = [...new Set(data.map(item => item.group))];
-  const uniqueSubgroups = [...new Set(data.map(item => item.subgroup))];
-  const uniqueStores = [...new Set(data.map(item => item.store))];
+  const uniqueMonths = [...new Set(data.map(item => item.month).filter(Boolean))];
+  const uniqueSessions = [...new Set(data.map(item => item.session).filter(Boolean))];
+  const uniqueGroups = [...new Set(data.map(item => item.group).filter(Boolean))];
+  const uniqueSubgroups = [...new Set(data.map(item => item.subgroup).filter(Boolean))];
+  const uniqueStores = [...new Set(data.map(item => item.store).filter(Boolean))];
 
   return (
     <Card className="shadow-card bg-gradient-to-r from-primary/5 to-success/5 border-primary/20">
