@@ -54,10 +54,10 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const { data: salesData, error } = await supabase
+        const { data: salesData, error } = await (supabase as any)
           .from('sales_data')
           .select('*')
-          .limit(2000); // Aumentar limite para garantir que todos os dados sejam carregados
+          .limit(2000);
 
         if (error) {
           console.error('Error fetching data:', error);
@@ -70,17 +70,38 @@ const Dashboard = () => {
         }
 
         if (salesData) {
-          console.log('Total dados carregados:', salesData.length);
-          console.log('Lojas encontradas:', [...new Set(salesData.map(d => d.store))].sort());
+          const raw = salesData as any[];
+          const normalized = raw.map((r) => ({
+            id: r.id,
+            month: r.month ?? r.mes ?? '',
+            year: (r.year ?? r.ano ?? '').toString(),
+            session: r.session ?? r.session_name ?? r.sessao ?? '',
+            group: r.group ?? r.group_name ?? r.grupo ?? '',
+            subgroup: r.subgroup ?? r.subgrupo ?? '',
+            store: r.store ?? r.store_id ?? r.loja ?? '',
+            total: Number(r.total ?? r.value_sold ?? r.valor_vendido_brl ?? 0),
+            date: r.date ?? r.created_at ?? new Date().toISOString(),
+            product_code: r.product_code ?? r.codigo ?? undefined,
+            product_description: r.product_description ?? r.descricao ?? undefined,
+            quantity_sold: Number(r.quantity_sold ?? r.qtd_vendida ?? 0),
+            value_sold: Number(r.value_sold ?? r.valor_vendido_brl ?? 0),
+            profit_value: Number(r.profit_value ?? r.lucro_brl ?? 0),
+            quantity_percentage: Number(r.quantity_percentage ?? r.perc_qtd_unitaria ?? 0),
+            value_percentage: Number(r.value_percentage ?? r.perc_valor_brl ?? 0),
+            profit_percentage: Number(r.profit_percentage ?? r.perc_lucro ?? 0),
+          })) as DataRecord[];
+
+          console.log('Total dados carregados:', normalized.length);
+          console.log('Lojas encontradas:', [...new Set(normalized.map(d => d.store))].sort());
           console.log('Dados por loja:', 
-            [...new Set(salesData.map(d => d.store))].sort().map(store => 
-              `${store}: ${salesData.filter(d => d.store === store).length} registros`
+            [...new Set(normalized.map(d => d.store))].sort().map(store => 
+              `${store}: ${normalized.filter(d => d.store === store).length} registros`
             )
           );
-          console.log('Meses encontrados:', [...new Set(salesData.map(d => d.month))].sort());
-          console.log('Anos encontrados:', [...new Set(salesData.map(d => d.year))].sort());
-          setData(salesData);
-          setFilteredData(salesData);
+          console.log('Meses encontrados:', [...new Set(normalized.map(d => d.month))].sort());
+          console.log('Anos encontrados:', [...new Set(normalized.map(d => d.year))].sort());
+          setData(normalized);
+          setFilteredData(normalized);
         }
       } catch (error) {
         console.error('Error:', error);

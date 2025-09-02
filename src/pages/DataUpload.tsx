@@ -31,7 +31,6 @@ const DataUpload = () => {
 
   const getCurrentYear = () => new Date().getFullYear();
   const years = Array.from({ length: 10 }, (_, i) => getCurrentYear() - 5 + i);
-  const stores = ["Loja 01", "Loja 02", "Loja 05", "Loja 07", "Loja 08", "Loja 09"];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({
@@ -124,7 +123,7 @@ const DataUpload = () => {
 
     try {
       // Verificar se já existem dados EXATOS para este período, loja, sessão E grupo/subgrupo
-      const { data: existingData, error: checkError } = await supabase
+      const { data: existingData, error: checkError } = await (supabase as any)
         .from('sales_data')
         .select('id')
         .eq('month', formData.month)
@@ -183,7 +182,7 @@ const DataUpload = () => {
       }));
 
       // Salvar no Supabase
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('sales_data')
         .insert(recordsToInsert);
 
@@ -325,19 +324,18 @@ const DataUpload = () => {
                 </div>
               </div>
 
-              {/* Store Selection */}
+              {/* Store Input */}
               <div className="space-y-2">
                 <Label htmlFor="store">Loja</Label>
-                <Select value={formData.store} onValueChange={(value) => handleInputChange("store", value)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a loja" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {stores.map((store) => (
-                      <SelectItem key={store} value={store}>{store}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Input
+                  id="store"
+                  type="text"
+                  value={formData.store}
+                  onChange={(e) => handleInputChange("store", e.target.value)}
+                  placeholder="Digite a loja (ex: Loja 09)"
+                  className="w-full"
+                />
+                <p className="text-xs text-muted-foreground">Mantenha o mesmo nome da loja para consistência.</p>
               </div>
 
               {/* File Upload */}

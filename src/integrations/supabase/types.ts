@@ -14,66 +14,141 @@ export type Database = {
   }
   public: {
     Tables: {
+      lojas: {
+        Row: {
+          created_at: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
       sales_data: {
         Row: {
           created_at: string
-          date: string | null
-          group: string
+          file_name: string | null
+          group_name: string
           id: string
-          month: string
-          product_code: string | null
-          product_description: string | null
-          profit_percentage: number | null
-          profit_value: number | null
-          quantity_percentage: number | null
-          quantity_sold: number | null
-          session: string
-          store: string
-          subgroup: string
-          total: number
-          value_percentage: number | null
-          value_sold: number | null
-          year: string
+          profit_brl: number
+          profit_percentage: number
+          quantity_percentage: number
+          quantity_sold: number
+          reference_month: number
+          reference_year: number
+          session_name: string
+          store_id: string
+          subgroup_name: string
+          updated_at: string
+          value_brl: number
+          value_percentage: number
         }
         Insert: {
           created_at?: string
-          date?: string | null
-          group: string
+          file_name?: string | null
+          group_name: string
           id?: string
-          month: string
-          product_code?: string | null
-          product_description?: string | null
-          profit_percentage?: number | null
-          profit_value?: number | null
-          quantity_percentage?: number | null
-          quantity_sold?: number | null
-          session: string
-          store: string
-          subgroup: string
-          total: number
-          value_percentage?: number | null
-          value_sold?: number | null
-          year: string
+          profit_brl?: number
+          profit_percentage?: number
+          quantity_percentage?: number
+          quantity_sold?: number
+          reference_month: number
+          reference_year: number
+          session_name: string
+          store_id: string
+          subgroup_name: string
+          updated_at?: string
+          value_brl?: number
+          value_percentage?: number
         }
         Update: {
           created_at?: string
-          date?: string | null
-          group?: string
+          file_name?: string | null
+          group_name?: string
           id?: string
-          month?: string
-          product_code?: string | null
-          product_description?: string | null
-          profit_percentage?: number | null
-          profit_value?: number | null
-          quantity_percentage?: number | null
-          quantity_sold?: number | null
-          session?: string
-          store?: string
-          subgroup?: string
-          total?: number
-          value_percentage?: number | null
-          value_sold?: number | null
-          year?: string
+          profit_brl?: number
+          profit_percentage?: number
+          quantity_percentage?: number
+          quantity_sold?: number
+          reference_month?: number
+          reference_year?: number
+          session_name?: string
+          store_id?: string
+          subgroup_name?: string
+          updated_at?: string
+          value_brl?: number
+          value_percentage?: number
+        }
+        Relationships: []
+      }
+      subgrupos: {
+        Row: {
+          created_at: string | null
+          id: string
+          nome: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          nome: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          nome?: string
+        }
+        Relationships: []
+      }
+      vendas_dados: {
+        Row: {
+          ano: number
+          created_at: string | null
+          id: string
+          loja: string
+          lucro_brl: number | null
+          mes: number
+          perc_lucro: number | null
+          perc_qtd_unitaria: number | null
+          perc_valor_brl: number | null
+          qtd_vendida: number | null
+          subgrupo: string
+          valor_vendido_brl: number | null
+        }
+        Insert: {
+          ano: number
+          created_at?: string | null
+          id?: string
+          loja: string
+          lucro_brl?: number | null
+          mes: number
+          perc_lucro?: number | null
+          perc_qtd_unitaria?: number | null
+          perc_valor_brl?: number | null
+          qtd_vendida?: number | null
+          subgrupo: string
+          valor_vendido_brl?: number | null
+        }
+        Update: {
+          ano?: number
+          created_at?: string | null
+          id?: string
+          loja?: string
+          lucro_brl?: number | null
+          mes?: number
+          perc_lucro?: number | null
+          perc_qtd_unitaria?: number | null
+          perc_valor_brl?: number | null
+          qtd_vendida?: number | null
+          subgrupo?: string
+          valor_vendido_brl?: number | null
         }
         Relationships: []
       }
