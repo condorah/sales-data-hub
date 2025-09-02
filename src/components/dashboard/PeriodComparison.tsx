@@ -17,7 +17,7 @@ export const PeriodComparison = ({ data, onClose }: PeriodComparisonProps) => {
   const [period1, setPeriod1] = useState("");
   const [period2, setPeriod2] = useState("");
 
-  const uniqueMonths = [...new Set(data.map(item => item.month))];
+  const uniqueMonths = [...new Set(data.map(item => item.month).filter(Boolean))];
   
   const period1Data = data.filter(item => item.month === period1);
   const period2Data = data.filter(item => item.month === period2);

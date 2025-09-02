@@ -21,11 +21,11 @@ export const TripleComparison = ({ data, onClose }: TripleComparisonProps) => {
   // Get unique values based on comparison type
   const getUniqueValues = () => {
     switch (comparisonType) {
-      case "month": return [...new Set(data.map(item => item.month))];
-      case "session": return [...new Set(data.map(item => item.session))];
-      case "group": return [...new Set(data.map(item => item.group))];
-      case "subgroup": return [...new Set(data.map(item => item.subgroup))];
-      case "store": return [...new Set(data.map(item => item.store))];
+      case "month": return [...new Set(data.map(item => item.month).filter(Boolean))];
+      case "session": return [...new Set(data.map(item => item.session).filter(Boolean))];
+      case "group": return [...new Set(data.map(item => item.group).filter(Boolean))];
+      case "subgroup": return [...new Set(data.map(item => item.subgroup).filter(Boolean))];
+      case "store": return [...new Set(data.map(item => item.store).filter(Boolean))];
       case "product": return [...new Set(data.map(item => item.product_code).filter(Boolean))];
       default: return [];
     }
